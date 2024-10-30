@@ -4,13 +4,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.quipy.api.ProjectAggregate
+import ru.quipy.api.ProjectAndMembersAggregate
+import ru.quipy.api.TaskStatusAndTasksAggregate
+import ru.quipy.api.UserAggregate
 import ru.quipy.core.EventSourcingServiceFactory
-import ru.quipy.logic.ProjectAggregateState
-import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
+import ru.quipy.logic.ProjectAndMembersAggregateState
+import ru.quipy.logic.TaskStatusAndTasksAggregateState
+import ru.quipy.logic.UserAggregateState
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
-import java.util.*
+import java.util.UUID
 import javax.annotation.PostConstruct
 
 /**
@@ -41,8 +44,8 @@ class EventSourcingLibConfiguration {
     @Autowired
     private lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
-    @Autowired
-    private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
+//    @Autowired
+//    private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
 
     @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory
@@ -54,12 +57,20 @@ class EventSourcingLibConfiguration {
      * Use this object to create/update the aggregate
      */
     @Bean
-    fun projectEsService() = eventSourcingServiceFactory.create<UUID, ProjectAggregate, ProjectAggregateState>()
+    fun userEsService() = eventSourcingServiceFactory.create<UUID, UserAggregate, UserAggregateState>()
+
+    @Bean
+    fun projectEsService() =
+        eventSourcingServiceFactory.create<UUID, ProjectAndMembersAggregate, ProjectAndMembersAggregateState>()
+
+    @Bean
+    fun taskEsService() =
+        eventSourcingServiceFactory.create<UUID, TaskStatusAndTasksAggregate, TaskStatusAndTasksAggregateState>()
 
     @PostConstruct
     fun init() {
         // Demonstrates how to explicitly subscribe the instance of annotation based subscriber to some stream. See the [AggregateSubscriptionsManager]
-        subscriptionsManager.subscribe<ProjectAggregate>(projectEventSubscriber)
+//        subscriptionsManager.subscribe<ProjectAggregate>(projectEventSubscriber)
 
         // Demonstrates how you can set up the listeners to the event stream
         eventStreamManager.maintenance {
