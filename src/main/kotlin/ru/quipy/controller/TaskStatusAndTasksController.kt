@@ -11,14 +11,14 @@ import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusAndTasksAggregate
 import ru.quipy.api.TaskStatusCreatedEvent
 import ru.quipy.api.TaskUpdatedEvent
+import ru.quipy.commands.createTask
+import ru.quipy.commands.createTaskStatus
+import ru.quipy.commands.updateTask
 import ru.quipy.core.EventSourcingService
 import ru.quipy.entities.TaskEntity
 import ru.quipy.enums.StatusColor
 import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
-import ru.quipy.logic.createTask
-import ru.quipy.logic.createTaskStatus
-import ru.quipy.logic.updateTask
 import java.util.UUID
 
 @RestController

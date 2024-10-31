@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.UserAggregate
 import ru.quipy.api.UserCreatedEvent
+import ru.quipy.commands.createUser
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.UserAggregateState
-import ru.quipy.logic.create
 import java.util.UUID
 
 @RestController
@@ -20,7 +20,7 @@ class UserController(
 ) {
     @PostMapping("/{login}")
     fun createUser(@PathVariable login: String, @RequestParam name: String, @RequestParam password: String) : UserCreatedEvent {
-        return userEsService.create { it.create(UUID.randomUUID(), login, name, password) }
+        return userEsService.create { it.createUser(UUID.randomUUID(), login, name, password) }
     }
 
     @GetMapping("/{id}")

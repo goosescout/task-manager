@@ -10,12 +10,12 @@ import ru.quipy.api.MemberCreatedEvent
 import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.ProjectCreatedEvent
 import ru.quipy.api.UserAggregate
+import ru.quipy.commands.createMember
+import ru.quipy.commands.createProject
 import ru.quipy.core.EventSourcingService
 import ru.quipy.entities.MemberEntity
 import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.UserAggregateState
-import ru.quipy.logic.createMember
-import ru.quipy.logic.createProject
 import java.util.UUID
 
 @RestController
