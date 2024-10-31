@@ -8,4 +8,5 @@ data class TaskStatusEntity(
     val name: String,
     val projectId: UUID,
     val color: StatusColor,
+    var position: Int,
 )

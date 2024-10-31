@@ -1,5 +1,7 @@
 package ru.quipy.logic
 
+import ru.quipy.api.StatusDeletedEvent
+import ru.quipy.api.StatusPositionChangedEvent
 import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusAndTasksAggregate
 import ru.quipy.api.TaskStatusCreatedEvent
@@ -14,7 +16,7 @@ import java.util.UUID
 class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksAggregate> {
 
     private lateinit var id: UUID
-    private lateinit var taskStatus: TaskStatusEntity
+    private var statuses = mutableMapOf<UUID, TaskStatusEntity>()
     private var tasks = mutableMapOf<UUID, TaskEntity>()
 
     var createdAt: Long = System.currentTimeMillis()
@@ -22,20 +24,61 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     override fun getId() = id
 
-    fun getTaskStatusName() = taskStatus.name
-
     fun getTaskById(id: UUID) = tasks[id]
+
+    fun getStatusById(id: UUID) = statuses[id]
 
     @StateTransitionFunc
     fun statusCreatedApply(event: TaskStatusCreatedEvent) {
-        id = event.statusId
-        taskStatus = TaskStatusEntity(
+        id = event.projectId
+        statuses[event.statusId] = TaskStatusEntity(
             id = event.statusId,
             name = event.statusName,
-            projectId = event.projectId,
             color = event.color,
+            projectId = event.projectId,
+            position = statuses.size + 1
         )
         updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusDeletedApply(event: StatusDeletedEvent) {
+        if (tasks.values.any { it.statusId == event.statusId })
+            throw IllegalStateException("Task or tasks with status ${event.statusId} exists")
+
+        statuses.remove(event.statusId)
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusPositionChangedApply(event: StatusPositionChangedEvent) {
+        val status = statuses[event.statusId] ?: throw IllegalStateException("Status ${event.statusId} does not exist")
+
+        val oldPosition = status.position
+
+        if (event.position > statuses.size || event.position < 1)
+            throw IllegalArgumentException("Position ${event.position} out of bound")
+
+        if (event.position < oldPosition) {
+            statuses.entries.forEach {
+                if (it.value.position > event.position && it.value.position <= oldPosition) {
+                    val tmp = it.value
+                    tmp.position -= 1
+                    statuses[it.key] = tmp
+                }
+            }
+        } else {
+            statuses.entries.forEach {
+                if (it.value.position < event.position && it.value.position >= oldPosition) {
+                    val tmp = it.value
+                    tmp.position -= 1
+                    statuses[it.key] = tmp
+                }
+            }
+        }
+        status.position = event.position
+        statuses[event.statusId] = status
+        updatedAt = event.createdAt
     }
 
     @StateTransitionFunc
