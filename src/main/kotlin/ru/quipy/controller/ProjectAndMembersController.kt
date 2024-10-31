@@ -31,7 +31,7 @@ class ProjectAndMembersController(
         val user = userEsService.getState(userId)
             ?: throw NullPointerException("User $userId does not found")
 
-        return projectEsService.create {
+        return projectEsService.update(projectId) {
             it.createMember(UUID.randomUUID(), user.getLogin(), user.getName(), user.getId(), projectId)
         }
     }
