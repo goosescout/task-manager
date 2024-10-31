@@ -98,6 +98,11 @@ class TaskStatusAndTasksController(
         return taskEsService.getState(projectId)?.getTaskById(taskId)
     }
 
+    @GetMapping("/project/{projectId}/task-statuses-and-tasks")
+    fun getTaskStatusesAndTasks(@PathVariable projectId: UUID) : TaskStatusAndTasksAggregateState? {
+        return taskEsService.getState(projectId)
+    }
+
     @PostMapping("/project/{projectId}/task-status/create")
     fun createTaskStatus(
         @PathVariable projectId: UUID,

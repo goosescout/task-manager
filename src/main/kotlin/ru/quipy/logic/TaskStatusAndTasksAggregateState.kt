@@ -25,6 +25,10 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     override fun getId() = id
 
+    fun getTasks() = tasks.values.toList()
+
+    fun getStatuses() = statuses.values.toList()
+
     fun getTaskById(id: UUID) = tasks[id]
 
     fun getStatusById(id: UUID) = statuses[id]

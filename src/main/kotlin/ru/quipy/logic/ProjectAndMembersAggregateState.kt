@@ -22,6 +22,10 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
 
     fun getMemberById(id: UUID) = members[id]
 
+    fun getName() = project.name
+
+    fun getMembers() = members.values.toList()
+
     @StateTransitionFunc
     fun projectCreatedApply(event: ProjectCreatedEvent) {
         id = event.projectId
@@ -38,6 +42,7 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
             throw IllegalArgumentException("User ${event.userId} is already member of project ${event.projectId}")
 
         members[event.memberId] = MemberEntity(
+            id = event.memberId,
             name = event.memberName,
             login = event.memberLogin,
             userId = event.userId,

@@ -6,14 +6,14 @@ import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import java.util.UUID
 
 fun TaskStatusAndTasksAggregateState.createTaskStatus(
-    id: UUID,
-    name: String,
+    statusId: UUID,
+    statusName: String,
     projectId: UUID,
     color: StatusColor,
 ): TaskStatusCreatedEvent {
     return TaskStatusCreatedEvent(
-        statusId = id,
-        statusName = name,
+        statusId = statusId,
+        statusName = statusName,
         projectId = projectId,
         color = color,
     )

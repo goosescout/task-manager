@@ -21,6 +21,8 @@ class UserAggregateState : AggregateState<UUID, UserAggregate> {
 
     fun getName() = name
 
+    fun getPassword() = password
+
     @StateTransitionFunc
     fun userCreatedApply(event: UserCreatedEvent) {
         id = event.userId
