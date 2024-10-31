@@ -8,6 +8,6 @@ import ru.quipy.entities.UserEntity
 interface UsersRepository : JpaRepository<UserEntity, Long> {
     fun save(user: UserEntity)
 
-    @Query("SELECT u FROM UserEntity u WHERE name like :substr or login like :substr")
+    @Query("SELECT u FROM UserEntity u WHERE u.name LIKE :substr OR u.login LIKE :substr")
     fun findAllBySubstr(@Param("substr")substr: String) : List<UserEntity>
 }
