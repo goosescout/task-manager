@@ -85,20 +85,7 @@ class EventSourcingLibConfiguration {
 
     @PostConstruct
     fun init() {
-//        aggregateRegistry.register(UserAggregate::class, UserAggregateState::class) {
-//            registerStateTransition(UserCreatedEvent::class, UserAggregateState::userCreatedApply)
-//        }
-//        aggregateRegistry.register(TaskStatusAndTasksAggregate::class, TaskStatusAndTasksAggregateState::class) {
-//            registerStateTransition(TaskCreatedEvent::class, TaskStatusAndTasksAggregateState::taskCreatedApply)
-//            registerStateTransition(TaskStatusCreatedEvent::class, TaskStatusAndTasksAggregateState::statusCreatedApply)
-//            registerStateTransition(TaskUpdatedEvent::class, TaskStatusAndTasksAggregateState::taskUpdatedApply)
-//        }
-//        aggregateRegistry.register(ProjectAndMembersAggregate::class, ProjectAndMembersAggregateState::class) {
-//            registerStateTransition(ProjectCreatedEvent::class, ProjectAndMembersAggregateState::projectCreatedApply)
-//            registerStateTransition(MemberCreatedEvent::class, ProjectAndMembersAggregateState::memberCreatedApply)
-//        }
-
-//        subscriptionsManager.subscribe<UserAggregate>(userViewService)
+        subscriptionsManager.subscribe<UserAggregate>(userViewService)
 
         eventStreamManager.maintenance {
             onRecordHandledSuccessfully { streamName, eventName ->
