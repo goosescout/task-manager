@@ -23,6 +23,18 @@ class TaskCreatedEvent(
     createdAt = createdAt,
 )
 
+@DomainEvent(name = TASK_CREATED_EVENT)
+class TaskUpdatedEvent(
+    val taskId: UUID,
+    val statusId: UUID,
+    val taskName: String,
+    val description: String,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<TaskStatusAndTasksAggregate>(
+    name = TASK_CREATED_EVENT,
+    createdAt = createdAt,
+)
+
 @DomainEvent(name = TASK_STATUS_CREATED_EVENT)
 class TaskStatusCreatedEvent(
     val statusId: UUID,

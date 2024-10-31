@@ -4,6 +4,7 @@ import ru.quipy.api.MemberCreatedEvent
 import ru.quipy.api.ProjectCreatedEvent
 import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusCreatedEvent
+import ru.quipy.api.TaskUpdatedEvent
 import ru.quipy.enums.StatusColor
 import java.util.UUID
 
@@ -20,6 +21,20 @@ fun TaskStatusAndTasksAggregateState.createTask(
         description = description,
         projectId = projectId,
         statusId = statusId,
+    )
+}
+
+fun TaskStatusAndTasksAggregateState.updateTask(
+    id: UUID,
+    statusId: UUID,
+    name: String,
+    description: String,
+): TaskUpdatedEvent {
+    return TaskUpdatedEvent(
+        taskId = id,
+        statusId = statusId,
+        taskName = name,
+        description = description,
     )
 }
 

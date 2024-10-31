@@ -3,6 +3,7 @@ package ru.quipy.controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.MemberCreatedEvent
@@ -10,20 +11,21 @@ import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.ProjectCreatedEvent
 import ru.quipy.api.UserAggregate
 import ru.quipy.core.EventSourcingService
+import ru.quipy.entities.MemberEntity
 import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.UserAggregateState
-import ru.quipy.logic.create
 import ru.quipy.logic.createMember
 import ru.quipy.logic.createProject
 import java.util.UUID
 
 @RestController
+@RequestMapping("/project")
 class ProjectAndMembersController(
     val projectEsService: EventSourcingService<UUID, ProjectAndMembersAggregate, ProjectAndMembersAggregateState>,
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
-    @PostMapping("/project/{projectId}/add-project-member")
+    @PostMapping("/{projectId}/create-project-member")
     fun createMember(@PathVariable projectId: UUID, @RequestParam userId: UUID) : MemberCreatedEvent {
         val user = userEsService.getState(userId)
             ?: throw NullPointerException("User $userId does not found")
@@ -33,16 +35,14 @@ class ProjectAndMembersController(
         }
     }
 
-//  TODO: поиск мембера, содержащегося в проекте
-//
-//    @GetMapping("/project-member/{id}")
-//    fun getMember(@PathVariable id: UUID) : ProjectAndMembersAggregateState? {
-//        return projectEsService.getState(id)
-//    }
+    @GetMapping("/{projectId}/member/{memberId}")
+    fun getMember(@PathVariable projectId: UUID, @PathVariable memberId: UUID) : MemberEntity? {
+        return projectEsService.getState(projectId)?.getMemberById(memberId)
+    }
 
-    @PostMapping("/project/{name}")
+    @PostMapping("/create")
     fun createProject(
-        @PathVariable name: String,
+        @RequestParam name: String,
         @RequestParam creatorId: UUID,
         @RequestParam password: String
     ) : ProjectCreatedEvent {
@@ -56,7 +56,7 @@ class ProjectAndMembersController(
         return response
     }
 
-    @GetMapping("/project/{id}")
+    @GetMapping("/{id}")
     fun getProject(@PathVariable id: UUID) : ProjectAndMembersAggregateState? {
         return projectEsService.getState(id)
     }

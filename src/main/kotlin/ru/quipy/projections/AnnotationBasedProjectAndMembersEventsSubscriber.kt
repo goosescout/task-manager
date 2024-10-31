@@ -15,6 +15,7 @@ class AnnotationBasedProjectAndMembersEventsSubscriber {
     val logger: Logger = LoggerFactory.getLogger(AnnotationBasedProjectAndMembersEventsSubscriber::class.java)
 
 //    TODO: сделать
+//
 //    @SubscribeEvent
 //    fun taskCreatedSubscriber(event: TaskCreatedEvent) {
 //        logger.info("Task created: {}", event.taskName)

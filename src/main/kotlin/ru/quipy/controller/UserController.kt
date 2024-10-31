@@ -28,7 +28,7 @@ class UserController(
         return userEsService.getState(id)
     }
 
-    // TODO: search members by login/name
+//     TODO: search members by login/name
 //
 //    @GetMapping("/search/{string}")
 //    fun getUsers(@PathVariable string: String) : UserAggregateState? {
