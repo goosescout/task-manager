@@ -47,6 +47,16 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
         if (tasks.values.any { it.statusId == event.statusId })
             throw IllegalStateException("Task or tasks with status ${event.statusId} exists")
 
+        val status = statuses[event.statusId] ?: throw NullPointerException("Status ${event.statusId} does not exist")
+
+        statuses.entries.forEach {
+            if (it.value.position > status.position) {
+                val tmp = it.value
+                tmp.position -= 1
+                statuses[it.key] = tmp
+            }
+        }
+
         statuses.remove(event.statusId)
         updatedAt = event.createdAt
     }
@@ -77,6 +87,7 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
                 }
             }
         }
+
         status.position = event.position
         statuses[event.statusId] = status
         updatedAt = event.createdAt

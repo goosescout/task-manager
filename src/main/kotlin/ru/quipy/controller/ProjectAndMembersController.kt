@@ -3,18 +3,18 @@ package ru.quipy.controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.quipy.api.MemberCreatedEvent
-import ru.quipy.api.ProjectAndMembersAggregate
-import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.UserAggregate
+import ru.quipy.api.*
 import ru.quipy.commands.createMember
 import ru.quipy.commands.createProject
+import ru.quipy.commands.createTaskStatus
 import ru.quipy.core.EventSourcingService
 import ru.quipy.entities.MemberEntity
+import ru.quipy.enums.StatusColor
 import ru.quipy.logic.ProjectAndMembersAggregateState
+import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import ru.quipy.logic.UserAggregateState
 import java.util.UUID
 
@@ -22,6 +22,7 @@ import java.util.UUID
 @RequestMapping("/project")
 class ProjectAndMembersController(
     val projectEsService: EventSourcingService<UUID, ProjectAndMembersAggregate, ProjectAndMembersAggregateState>,
+    val taskEsService: EventSourcingService<UUID, TaskStatusAndTasksAggregate, TaskStatusAndTasksAggregateState>,
     val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
 ) {
 
@@ -49,9 +50,13 @@ class ProjectAndMembersController(
             ?: throw NullPointerException("User $creatorId does not found")
 
         val response = projectEsService.create { it.createProject(UUID.randomUUID(), name) }
+        taskEsService.create {
+            it.createTaskStatus(UUID.randomUUID(), "CREATED", response.projectId, StatusColor.GREEN)
+        }
         projectEsService.update(response.projectId) {
             it.createMember(UUID.randomUUID(), user.getLogin(), user.getName(), user.getId(), response.projectId)
         }
+
         return response
     }
 
@@ -59,6 +64,4 @@ class ProjectAndMembersController(
     fun getProject(@PathVariable id: UUID) : ProjectAndMembersAggregateState? {
         return projectEsService.getState(id)
     }
-
-    // TODO: get all projects, search members by login/name
 }

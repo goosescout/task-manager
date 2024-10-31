@@ -19,14 +19,13 @@ import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import ru.quipy.logic.UserAggregateState
 import ru.quipy.projections.AnnotationBasedUserEventsSubscriber
-import ru.quipy.services.UserViewService
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.UUID
 import javax.annotation.PostConstruct
 
 /**
- * This files contains some configurations that you might want to have in your project. Some configurations are
+ * This file contains some configurations that you might want to have in your project. Some configurations are
  * made in for the sake of demonstration and not required for the library functioning. Usually you can have even
  * more minimalistic config
  *
@@ -53,9 +52,6 @@ class EventSourcingLibConfiguration {
 
     @Autowired
     private lateinit var projectEventSubscriber: AnnotationBasedUserEventsSubscriber
-
-    @Autowired
-    private lateinit var userViewService: UserViewService
 
     @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory
@@ -85,8 +81,6 @@ class EventSourcingLibConfiguration {
 
     @PostConstruct
     fun init() {
-        subscriptionsManager.subscribe<UserAggregate>(userViewService)
-
         eventStreamManager.maintenance {
             onRecordHandledSuccessfully { streamName, eventName ->
                 logger.info("Stream $streamName successfully processed record of $eventName")

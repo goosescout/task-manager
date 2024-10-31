@@ -36,7 +36,7 @@ class TaskStatusAndTasksController(
     val projectEsService: EventSourcingService<UUID, ProjectAndMembersAggregate, ProjectAndMembersAggregateState>,
 ) {
 
-    @PostMapping("/project/{projectId}/task")
+    @PostMapping("/project/{projectId}/task/create")
     fun createTask(
         @PathVariable projectId: UUID,
         @RequestParam statusId: UUID,
@@ -68,7 +68,7 @@ class TaskStatusAndTasksController(
     fun changeStatusForTask(
         @PathVariable projectId: UUID,
         @PathVariable taskId: UUID,
-        @PathVariable statusId: UUID,
+        @RequestParam statusId: UUID,
     ) : StatusChangedForTaskEvent {
         taskEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
@@ -84,7 +84,7 @@ class TaskStatusAndTasksController(
         return taskEsService.update(projectId) { it.deleteTaskStatus(projectId, statusId) }
     }
 
-    @DeleteMapping("/project/{projectId}/status/{statusId}/change-position")
+    @PostMapping("/project/{projectId}/status/{statusId}/change-position")
     fun changeTaskStatusPosition(
         @PathVariable projectId: UUID,
         @PathVariable statusId: UUID,
@@ -98,7 +98,7 @@ class TaskStatusAndTasksController(
         return taskEsService.getState(projectId)?.getTaskById(taskId)
     }
 
-    @PostMapping("/project/{projectId}/task-status")
+    @PostMapping("/project/{projectId}/task-status/create")
     fun createTaskStatus(
         @PathVariable projectId: UUID,
         @RequestParam name: String,
@@ -108,14 +108,11 @@ class TaskStatusAndTasksController(
         projectEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
 
-        return if (taskEsService.getState(projectId) != null) {
-            taskEsService.update(projectId) {
-                it.createTaskStatus(UUID.randomUUID(), name, projectId, StatusColor.valueOf(color))
-            }
-        } else {
-            taskEsService.create {
-                it.createTaskStatus(UUID.randomUUID(), name, projectId, StatusColor.valueOf(color))
-            }
+        if (taskEsService.getState(projectId) == null)
+            throw NullPointerException("Task statuses aggregate $projectId does not exist")
+
+        return taskEsService.update(projectId) {
+            it.createTaskStatus(UUID.randomUUID(), name, projectId, StatusColor.valueOf(color))
         }
     }
 
@@ -124,7 +121,7 @@ class TaskStatusAndTasksController(
         return taskEsService.getState(projectId)?.getStatusById(id)
     }
 
-    @GetMapping("project/{projectId}/task/{statusId}/add-assignee")
+    @PostMapping("project/{projectId}/task/{statusId}/add-assignee")
     fun addAssigneeForTask(
         @PathVariable projectId: UUID,
         @PathVariable statusId: UUID,
@@ -138,7 +135,4 @@ class TaskStatusAndTasksController(
 
         return taskEsService.update(projectId) { it.addTaskAssignee(statusId, memberId) }
     }
-
-
-//     TODO: get all projects, search members by login/name
 }

@@ -20,8 +20,6 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
 
     override fun getId() = id
 
-    fun getProjectName() = project.name
-
     fun getMemberById(id: UUID) = members[id]
 
     @StateTransitionFunc
