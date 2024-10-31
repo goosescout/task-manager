@@ -1,5 +1,6 @@
 package ru.quipy.logic
 
+import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
 import ru.quipy.api.TaskCreatedEvent
@@ -52,7 +53,7 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     @StateTransitionFunc
     fun statusPositionChangedApply(event: StatusPositionChangedEvent) {
-        val status = statuses[event.statusId] ?: throw IllegalStateException("Status ${event.statusId} does not exist")
+        val status = statuses[event.statusId] ?: throw NullPointerException("Status ${event.statusId} does not exist")
 
         val oldPosition = status.position
 
@@ -78,6 +79,18 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
         }
         status.position = event.position
         statuses[event.statusId] = status
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusChangedForTaskEventApply(event: StatusChangedForTaskEvent) {
+        if (!statuses.containsKey(event.statusId))
+            throw NullPointerException("Status ${event.statusId} does not exist")
+
+        if (!tasks.containsKey(event.taskId))
+            throw NullPointerException("Task ${event.taskId} does not exist")
+
+        tasks[event.taskId]?.statusId = event.statusId
         updatedAt = event.createdAt
     }
 

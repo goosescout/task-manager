@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.ProjectAndMembersAggregate
+import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
 import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusAndTasksAggregate
 import ru.quipy.api.TaskStatusCreatedEvent
 import ru.quipy.api.TaskUpdatedEvent
+import ru.quipy.commands.changeStatusForTask
 import ru.quipy.commands.changeTaskStatusPosition
 import ru.quipy.commands.createTask
 import ru.quipy.commands.createTaskStatus
@@ -41,8 +43,6 @@ class TaskStatusAndTasksController(
     ) : TaskCreatedEvent {
         projectEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
-        taskEsService.getState(statusId)
-            ?: throw NullPointerException("Status $statusId does not found")
 
         return taskEsService.update(projectId) {
             it.createTask(UUID.randomUUID(), name, description, projectId, statusId)
@@ -57,9 +57,21 @@ class TaskStatusAndTasksController(
         @RequestParam description: String,
     ) : TaskUpdatedEvent {
         taskEsService.getState(projectId)
-            ?: throw NullPointerException("Status $projectId does not found")
+            ?: throw NullPointerException("Project $projectId does not found")
 
         return taskEsService.update(projectId) { it.updateTask(taskId, projectId, name, description) }
+    }
+
+    @PostMapping("/project/{projectId}/task/{taskId}/change-status")
+    fun changeStatusForTask(
+        @PathVariable projectId: UUID,
+        @PathVariable taskId: UUID,
+        @PathVariable statusId: UUID,
+    ) : StatusChangedForTaskEvent {
+        taskEsService.getState(projectId)
+            ?: throw NullPointerException("Project $projectId does not found")
+
+        return taskEsService.update(projectId) { it.changeStatusForTask(taskId, projectId, statusId) }
     }
 
     @DeleteMapping("/project/{projectId}/status/{statusId}")
