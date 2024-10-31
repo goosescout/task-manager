@@ -6,6 +6,7 @@ import ru.quipy.enums.StatusColor
 import java.util.UUID
 
 const val TASK_CREATED_EVENT = "TASK_CREATED_EVENT"
+const val TASK_UPDATED_EVENT = "TASK_UPDATED_EVENT"
 const val TASK_STATUS_CREATED_EVENT = "TASK_STATUS_CREATED_EVENT"
 
 // API
@@ -23,7 +24,7 @@ class TaskCreatedEvent(
     createdAt = createdAt,
 )
 
-@DomainEvent(name = TASK_CREATED_EVENT)
+@DomainEvent(name = TASK_UPDATED_EVENT)
 class TaskUpdatedEvent(
     val taskId: UUID,
     val statusId: UUID,
@@ -31,7 +32,7 @@ class TaskUpdatedEvent(
     val description: String,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
-    name = TASK_CREATED_EVENT,
+    name = TASK_UPDATED_EVENT,
     createdAt = createdAt,
 )
 

@@ -4,13 +4,22 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.quipy.api.MemberCreatedEvent
 import ru.quipy.api.ProjectAndMembersAggregate
+import ru.quipy.api.ProjectCreatedEvent
+import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusAndTasksAggregate
+import ru.quipy.api.TaskStatusCreatedEvent
+import ru.quipy.api.TaskUpdatedEvent
 import ru.quipy.api.UserAggregate
+import ru.quipy.api.UserCreatedEvent
+import ru.quipy.core.AggregateRegistry
 import ru.quipy.core.EventSourcingServiceFactory
 import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import ru.quipy.logic.UserAggregateState
+import ru.quipy.projections.AnnotationBasedUserEventsSubscriber
+import ru.quipy.services.UserViewService
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.UUID
@@ -41,17 +50,24 @@ class EventSourcingLibConfiguration {
 
     private val logger = LoggerFactory.getLogger(EventSourcingLibConfiguration::class.java)
 
-    @Autowired
-    private lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
-//    @Autowired
-//    private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
+    @Autowired
+    private lateinit var projectEventSubscriber: AnnotationBasedUserEventsSubscriber
+
+    @Autowired
+    private lateinit var userViewService: UserViewService
 
     @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory
 
     @Autowired
     private lateinit var eventStreamManager: AggregateEventStreamManager
+
+    @Autowired
+    private lateinit var aggregateRegistry: AggregateRegistry
+
+    @Autowired
+    private lateinit var subscriptionsManager : AggregateSubscriptionsManager
 
     /**
      * Use this object to create/update the aggregate
@@ -69,10 +85,21 @@ class EventSourcingLibConfiguration {
 
     @PostConstruct
     fun init() {
-        // Demonstrates how to explicitly subscribe the instance of annotation based subscriber to some stream. See the [AggregateSubscriptionsManager]
-//        subscriptionsManager.subscribe<ProjectAggregate>(projectEventSubscriber)
+//        aggregateRegistry.register(UserAggregate::class, UserAggregateState::class) {
+//            registerStateTransition(UserCreatedEvent::class, UserAggregateState::userCreatedApply)
+//        }
+//        aggregateRegistry.register(TaskStatusAndTasksAggregate::class, TaskStatusAndTasksAggregateState::class) {
+//            registerStateTransition(TaskCreatedEvent::class, TaskStatusAndTasksAggregateState::taskCreatedApply)
+//            registerStateTransition(TaskStatusCreatedEvent::class, TaskStatusAndTasksAggregateState::statusCreatedApply)
+//            registerStateTransition(TaskUpdatedEvent::class, TaskStatusAndTasksAggregateState::taskUpdatedApply)
+//        }
+//        aggregateRegistry.register(ProjectAndMembersAggregate::class, ProjectAndMembersAggregateState::class) {
+//            registerStateTransition(ProjectCreatedEvent::class, ProjectAndMembersAggregateState::projectCreatedApply)
+//            registerStateTransition(MemberCreatedEvent::class, ProjectAndMembersAggregateState::memberCreatedApply)
+//        }
 
-        // Demonstrates how you can set up the listeners to the event stream
+//        subscriptionsManager.subscribe<UserAggregate>(userViewService)
+
         eventStreamManager.maintenance {
             onRecordHandledSuccessfully { streamName, eventName ->
                 logger.info("Stream $streamName successfully processed record of $eventName")
@@ -83,5 +110,4 @@ class EventSourcingLibConfiguration {
             }
         }
     }
-
 }
