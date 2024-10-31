@@ -3,6 +3,7 @@ package ru.quipy.logic
 import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
+import ru.quipy.api.TaskAssigneeAddedEvent
 import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusAndTasksAggregate
 import ru.quipy.api.TaskStatusCreatedEvent
@@ -11,7 +12,6 @@ import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
-import ru.quipy.enums.StatusColor
 import java.util.UUID
 
 class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksAggregate> {
@@ -111,6 +111,16 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
             statusId = event.statusId,
             assignees = event.assignees,
         )
+        updatedAt = createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskAssigneeAddedEventApply(event: TaskAssigneeAddedEvent) {
+        val task = tasks[event.taskId] ?: throw NullPointerException("Task ${event.taskId} does not exist")
+        if (task.assignees.contains(event.memberId))
+            throw IllegalArgumentException("Member ${event.memberId} already assigned to task ${event.taskId}")
+
+        tasks[event.taskId]!!.assignees.add(event.memberId)
         updatedAt = createdAt
     }
 }

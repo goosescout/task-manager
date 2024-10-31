@@ -10,10 +10,12 @@ import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
+import ru.quipy.api.TaskAssigneeAddedEvent
 import ru.quipy.api.TaskCreatedEvent
 import ru.quipy.api.TaskStatusAndTasksAggregate
 import ru.quipy.api.TaskStatusCreatedEvent
 import ru.quipy.api.TaskUpdatedEvent
+import ru.quipy.commands.addTaskAssignee
 import ru.quipy.commands.changeStatusForTask
 import ru.quipy.commands.changeTaskStatusPosition
 import ru.quipy.commands.createTask
@@ -121,6 +123,22 @@ class TaskStatusAndTasksController(
     fun getTaskStatus(@PathVariable projectId: UUID, @PathVariable id: UUID) : TaskStatusEntity? {
         return taskEsService.getState(projectId)?.getStatusById(id)
     }
+
+    @GetMapping("project/{projectId}/task/{statusId}/add-assignee")
+    fun addAssigneeForTask(
+        @PathVariable projectId: UUID,
+        @PathVariable statusId: UUID,
+        @RequestParam memberId: UUID,
+    ) : TaskAssigneeAddedEvent? {
+        val project = projectEsService.getState(projectId)
+            ?: throw NullPointerException("Project $projectId does not found")
+
+        if (project.getMemberById(memberId) == null)
+            throw NullPointerException("Project $memberId does not found")
+
+        return taskEsService.update(projectId) { it.addTaskAssignee(statusId, memberId) }
+    }
+
 
 //     TODO: get all projects, search members by login/name
 }

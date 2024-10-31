@@ -7,6 +7,6 @@ data class TaskEntity(
     var name: String,
     var description: String,
     val projectId: UUID,
-    val assignees: List<UUID>,
+    val assignees: MutableList<UUID>,
     var statusId: UUID,
 )
