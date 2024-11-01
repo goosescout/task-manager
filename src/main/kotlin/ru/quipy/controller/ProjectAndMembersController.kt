@@ -49,9 +49,9 @@ class ProjectAndMembersController(
         val user = userEsService.getState(creatorId)
             ?: throw NullPointerException("User $creatorId does not found")
 
-        val response = projectEsService.create { it.createProject(UUID.randomUUID(), name) }
+        val response = projectEsService.create { it.createProject(UUID.randomUUID(), UUID.randomUUID(), name) }
         taskEsService.create {
-            it.createTaskStatus(UUID.randomUUID(), "CREATED", response.projectId, StatusColor.GREEN)
+            it.createTaskStatus(UUID.randomUUID(), "CREATED", response.statusesAndTasksAggregateId, response.projectId, StatusColor.GREEN)
         }
         projectEsService.update(response.projectId) {
             it.createMember(UUID.randomUUID(), user.getLogin(), user.getName(), user.getId(), response.projectId)

@@ -35,7 +35,7 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     @StateTransitionFunc
     fun statusCreatedApply(event: TaskStatusCreatedEvent) {
-        id = event.projectId
+        id = event.aggregateId
         statuses[event.statusId] = TaskStatusEntity(
             id = event.statusId,
             name = event.statusName,

@@ -30,7 +30,6 @@ class TaskCreatedEvent(
 
 @DomainEvent(name = TASK_DELETED_EVENT)
 class StatusDeletedEvent(
-    val projectId: UUID,
     val statusId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
@@ -40,7 +39,6 @@ class StatusDeletedEvent(
 
 @DomainEvent(name = TASK_STATUS_POSITION_CHANGED_EVENT)
 class StatusPositionChangedEvent(
-    val projectId: UUID,
     val statusId: UUID,
     val position: Int,
     createdAt: Long = System.currentTimeMillis(),
@@ -52,7 +50,6 @@ class StatusPositionChangedEvent(
 @DomainEvent(name = TASK_UPDATED_EVENT)
 class TaskUpdatedEvent(
     val taskId: UUID,
-    val statusId: UUID,
     val taskName: String,
     val description: String,
     createdAt: Long = System.currentTimeMillis(),
@@ -65,6 +62,7 @@ class TaskUpdatedEvent(
 class TaskStatusCreatedEvent(
     val statusId: UUID,
     val statusName: String,
+    val aggregateId: UUID,
     val projectId: UUID,
     val color: StatusColor,
     createdAt: Long = System.currentTimeMillis(),
@@ -76,7 +74,6 @@ class TaskStatusCreatedEvent(
 @DomainEvent(name = STATUS_CHANGED_FOR_TASK_EVENT)
 class StatusChangedForTaskEvent(
     val taskId: UUID,
-    val projectId: UUID,
     val statusId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(

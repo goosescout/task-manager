@@ -4,6 +4,7 @@ import ru.quipy.api.MemberCreatedEvent
 import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.ProjectCreatedEvent
 import ru.quipy.core.annotations.StateTransitionFunc
+import ru.quipy.domain.Aggregate
 import ru.quipy.domain.AggregateState
 import ru.quipy.entities.MemberEntity
 import ru.quipy.entities.ProjectEntity
@@ -12,6 +13,7 @@ import java.util.UUID
 class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAggregate> {
 
     private lateinit var id: UUID
+    private lateinit var statusesAndTasksAggregateId: UUID
     private lateinit var project: ProjectEntity
     private var members = mutableMapOf<UUID, MemberEntity>()
 
@@ -19,6 +21,8 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
     var updatedAt: Long = System.currentTimeMillis()
 
     override fun getId() = id
+
+    fun getStatusesAndTasksAggregateId() = statusesAndTasksAggregateId
 
     fun getMemberById(id: UUID) = members[id]
 
@@ -29,6 +33,7 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
     @StateTransitionFunc
     fun projectCreatedApply(event: ProjectCreatedEvent) {
         id = event.projectId
+        statusesAndTasksAggregateId = event.statusesAndTasksAggregateId
         project = ProjectEntity(
             id = event.projectId,
             name = event.projectName,

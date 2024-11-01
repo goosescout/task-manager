@@ -43,10 +43,10 @@ class TaskStatusAndTasksController(
         @RequestParam name: String,
         @RequestParam description: String,
     ) : TaskCreatedEvent {
-        projectEsService.getState(projectId)
+        val project = projectEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
 
-        return taskEsService.update(projectId) {
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
             it.createTask(UUID.randomUUID(), name, description, projectId, statusId)
         }
     }
@@ -58,10 +58,12 @@ class TaskStatusAndTasksController(
         @RequestParam name: String,
         @RequestParam description: String,
     ) : TaskUpdatedEvent {
-        taskEsService.getState(projectId)
+        val project = projectEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
 
-        return taskEsService.update(projectId) { it.updateTask(taskId, projectId, name, description) }
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
+            it.updateTask(taskId, name, description)
+        }
     }
 
     @PostMapping("/project/{projectId}/task/{taskId}/change-status")
@@ -70,10 +72,12 @@ class TaskStatusAndTasksController(
         @PathVariable taskId: UUID,
         @RequestParam statusId: UUID,
     ) : StatusChangedForTaskEvent {
-        taskEsService.getState(projectId)
+        val project = projectEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
 
-        return taskEsService.update(projectId) { it.changeStatusForTask(taskId, projectId, statusId) }
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
+            it.changeStatusForTask(taskId, statusId)
+        }
     }
 
     @DeleteMapping("/project/{projectId}/status/{statusId}")
@@ -81,7 +85,12 @@ class TaskStatusAndTasksController(
         @PathVariable projectId: UUID,
         @PathVariable statusId: UUID,
     ) : StatusDeletedEvent {
-        return taskEsService.update(projectId) { it.deleteTaskStatus(projectId, statusId) }
+        val project = projectEsService.getState(projectId)
+            ?: throw NullPointerException("Project $projectId does not found")
+
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
+            it.deleteTaskStatus(statusId)
+        }
     }
 
     @PostMapping("/project/{projectId}/status/{statusId}/change-position")
@@ -90,17 +99,28 @@ class TaskStatusAndTasksController(
         @PathVariable statusId: UUID,
         @RequestParam position: Int,
     ) : StatusPositionChangedEvent {
-        return taskEsService.update(projectId) { it.changeTaskStatusPosition(projectId, statusId, position) }
+        val project = projectEsService.getState(projectId)
+            ?: throw NullPointerException("Project $projectId does not found")
+
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
+            it.changeTaskStatusPosition(statusId, position)
+        }
     }
 
     @GetMapping("/project/{projectId}/task/{taskId}")
     fun getTask(@PathVariable projectId: UUID, @PathVariable taskId: UUID): TaskEntity? {
-        return taskEsService.getState(projectId)?.getTaskById(taskId)
+        val project = projectEsService.getState(projectId)
+            ?: throw NullPointerException("Project $projectId does not found")
+
+        return taskEsService.getState(project.getStatusesAndTasksAggregateId())?.getTaskById(taskId)
     }
 
     @GetMapping("/project/{projectId}/task-statuses-and-tasks")
     fun getTaskStatusesAndTasks(@PathVariable projectId: UUID) : TaskStatusAndTasksAggregateState? {
-        return taskEsService.getState(projectId)
+        val project = projectEsService.getState(projectId)
+            ?: throw NullPointerException("Project $projectId does not found")
+
+        return taskEsService.getState(project.getStatusesAndTasksAggregateId())
     }
 
     @PostMapping("/project/{projectId}/task-status/create")
@@ -110,14 +130,20 @@ class TaskStatusAndTasksController(
         @RequestParam color: String,
         @RequestParam position: Int?
     ) : TaskStatusCreatedEvent {
-        projectEsService.getState(projectId)
+        val project = projectEsService.getState(projectId)
             ?: throw NullPointerException("Project $projectId does not found")
 
-        if (taskEsService.getState(projectId) == null)
+        if (taskEsService.getState(project.getStatusesAndTasksAggregateId()) == null)
             throw NullPointerException("Task statuses aggregate $projectId does not exist")
 
-        return taskEsService.update(projectId) {
-            it.createTaskStatus(UUID.randomUUID(), name, projectId, StatusColor.valueOf(color))
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
+            it.createTaskStatus(
+                UUID.randomUUID(),
+                name,
+                project.getStatusesAndTasksAggregateId(),
+                projectId,
+                StatusColor.valueOf(color)
+            )
         }
     }
 
@@ -138,6 +164,8 @@ class TaskStatusAndTasksController(
         if (project.getMemberById(memberId) == null)
             throw NullPointerException("Project $memberId does not found")
 
-        return taskEsService.update(projectId) { it.addTaskAssignee(statusId, memberId) }
+        return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
+            it.addTaskAssignee(statusId, memberId)
+        }
     }
 }
