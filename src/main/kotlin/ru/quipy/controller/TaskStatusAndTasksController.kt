@@ -162,7 +162,7 @@ class TaskStatusAndTasksController(
             ?: throw NullPointerException("Project $projectId was not found")
 
         if (project.getMemberById(memberId) == null)
-            throw NullPointerException("Project $memberId does not found")
+            throw NullPointerException("Member $memberId was not found")
 
         return taskEsService.update(project.getStatusesAndTasksAggregateId()) {
             it.addTaskAssignee(taskId, memberId)
