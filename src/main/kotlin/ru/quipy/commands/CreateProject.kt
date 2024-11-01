@@ -7,7 +7,7 @@ import java.util.UUID
 fun ProjectAndMembersAggregateState.createProject(id: UUID, aggregateId: UUID, name: String): ProjectCreatedEvent {
     return ProjectCreatedEvent(
         projectId = id,
-        statusesAndTasksAggregateId = UUID.randomUUID(),
+        statusesAndTasksAggregateId = aggregateId,
         projectName = name,
     )
 }

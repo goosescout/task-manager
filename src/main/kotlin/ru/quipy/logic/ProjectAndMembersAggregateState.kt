@@ -20,7 +20,7 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
-    override fun getId() = id
+    override fun getId() = project.id
 
     fun getStatusesAndTasksAggregateId() = statusesAndTasksAggregateId
 
