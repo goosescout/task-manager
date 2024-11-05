@@ -17,6 +17,7 @@ import java.util.UUID
 class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksAggregate> {
 
     private lateinit var id: UUID
+    private lateinit var projectId: UUID
     private var statuses = mutableMapOf<UUID, TaskStatusEntity>()
     private var tasks = mutableMapOf<UUID, TaskEntity>()
 
@@ -36,11 +37,14 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
     @StateTransitionFunc
     fun statusCreatedApply(event: TaskStatusCreatedEvent) {
         id = event.aggregateId
+        if (event.projectId != null)
+            projectId = event.projectId
+
         statuses[event.statusId] = TaskStatusEntity(
             id = event.statusId,
             name = event.statusName,
             color = event.color,
-            projectId = event.projectId,
+            projectId = projectId,
             position = statuses.size + 1
         )
         updatedAt = createdAt
@@ -76,15 +80,15 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
         if (event.position < oldPosition) {
             statuses.entries.forEach {
-                if (it.value.position > event.position && it.value.position <= oldPosition) {
+                if (it.value.position >= event.position && it.value.position < oldPosition) {
                     val tmp = it.value
-                    tmp.position -= 1
+                    tmp.position += 1
                     statuses[it.key] = tmp
                 }
             }
         } else {
             statuses.entries.forEach {
-                if (it.value.position < event.position && it.value.position >= oldPosition) {
+                if (it.value.position <= event.position && it.value.position > oldPosition) {
                     val tmp = it.value
                     tmp.position -= 1
                     statuses[it.key] = tmp
@@ -122,7 +126,7 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
             id = event.taskId,
             name = event.taskName,
             description = event.description,
-            projectId = event.projectId,
+            projectId = projectId,
             statusId = event.statusId,
             assignees = event.assignees,
         )

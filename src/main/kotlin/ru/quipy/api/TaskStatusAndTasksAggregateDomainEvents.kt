@@ -19,7 +19,6 @@ class TaskCreatedEvent(
     val taskId: UUID,
     val taskName: String,
     val description: String,
-    val projectId: UUID,
     val statusId: UUID,
     val assignees: MutableList<UUID> = mutableListOf(),
     createdAt: Long = System.currentTimeMillis(),
@@ -33,7 +32,7 @@ class StatusDeletedEvent(
     val statusId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
-    name = TASK_UPDATED_EVENT,
+    name = TASK_DELETED_EVENT,
     createdAt = createdAt,
 )
 
@@ -63,8 +62,8 @@ class TaskStatusCreatedEvent(
     val statusId: UUID,
     val statusName: String,
     val aggregateId: UUID,
-    val projectId: UUID,
     val color: StatusColor,
+    val projectId: UUID?,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
     name = TASK_STATUS_CREATED_EVENT,
@@ -77,7 +76,7 @@ class StatusChangedForTaskEvent(
     val statusId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
-    name = TASK_UPDATED_EVENT,
+    name = STATUS_CHANGED_FOR_TASK_EVENT,
     createdAt = createdAt,
 )
 

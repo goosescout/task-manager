@@ -8,14 +8,12 @@ fun TaskStatusAndTasksAggregateState.createTask(
     id: UUID,
     name: String,
     description: String,
-    projectId: UUID,
     statusId: UUID,
 ): TaskCreatedEvent {
     return TaskCreatedEvent(
         taskId = id,
         taskName = name,
         description = description,
-        projectId = projectId,
         statusId = statusId,
     )
 }
