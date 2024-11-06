@@ -18,6 +18,16 @@ class ProjectCreatedEvent(
     createdAt = createdAt,
 )
 
+@DomainEvent(name = TASK_STATUS_CREATED_EVENT)
+class TaskStatusCreatedForProjectEvent(
+    val projectId: UUID,
+    val aggregateId: UUID,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAndMembersAggregate>(
+    name = TASK_STATUS_CREATED_EVENT,
+    createdAt = createdAt,
+)
+
 @DomainEvent(name = MEMBER_CREATED_EVENT)
 class MemberCreatedEvent(
     val memberId: UUID,

@@ -3,9 +3,8 @@ package ru.quipy.logic
 import ru.quipy.api.MemberCreatedEvent
 import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.ProjectCreatedEvent
-import ru.quipy.api.TaskStatusCreatedEvent
+import ru.quipy.api.TaskStatusCreatedForProjectEvent
 import ru.quipy.core.annotations.StateTransitionFunc
-import ru.quipy.domain.Aggregate
 import ru.quipy.domain.AggregateState
 import ru.quipy.entities.MemberEntity
 import ru.quipy.entities.ProjectEntity
@@ -54,7 +53,7 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
     }
 
     @StateTransitionFunc
-    fun taskStatusCreatedApply(event: TaskStatusCreatedEvent) {
+    fun taskStatusCreatedApply(event: TaskStatusCreatedForProjectEvent) {
         if (event.projectId == project.id) {
             statusesAndTasksAggregateId = event.aggregateId
             updatedAt = createdAt

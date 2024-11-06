@@ -86,6 +86,6 @@ class TaskAssigneeAddedEvent(
     val memberId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
-    name = TASK_UPDATED_EVENT,
+    name = TASK_ASSINGNEE_ADDED_EVENT,
     createdAt = createdAt,
 )

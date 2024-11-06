@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
+import ru.quipy.commands.addStatusAggregateId
 import ru.quipy.commands.createMember
 import ru.quipy.commands.createProject
 import ru.quipy.commands.createTaskStatus
@@ -49,11 +50,14 @@ class ProjectAndMembersController(
 
         val response = projectEsService.create { it.createProject(UUID.randomUUID(), name) }
 
-        taskEsService.create {
+        val taskResponse = taskEsService.create {
             it.createTaskStatus(UUID.randomUUID(), "CREATED", UUID.randomUUID(), StatusColor.GREEN, response.projectId)
         }
         projectEsService.update(response.projectId) {
             it.createMember(UUID.randomUUID(), user?.getLogin(), user?.getName(), user?.getId(), response.projectId)
+        }
+        projectEsService.update(response.projectId) {
+            it.addStatusAggregateId(response.projectId, taskResponse.aggregateId)
         }
 
         return response
