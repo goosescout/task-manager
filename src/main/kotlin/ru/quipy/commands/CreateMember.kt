@@ -11,6 +11,9 @@ fun ProjectAndMembersAggregateState.createMember(
     userId: UUID,
     projectId: UUID
 ): MemberCreatedEvent {
+    if (members.entries.firstOrNull { it.value.userId == userId } != null)
+        throw IllegalArgumentException("User $userId is already member of project $projectId")
+
     return MemberCreatedEvent(
         memberId = memberId,
         memberLogin = login,

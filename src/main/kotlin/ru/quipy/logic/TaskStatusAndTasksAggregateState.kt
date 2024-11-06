@@ -18,8 +18,8 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     private lateinit var id: UUID
     private lateinit var projectId: UUID
-    private var statuses = mutableMapOf<UUID, TaskStatusEntity>()
-    private var tasks = mutableMapOf<UUID, TaskEntity>()
+    internal var statuses = mutableMapOf<UUID, TaskStatusEntity>()
+    internal var tasks = mutableMapOf<UUID, TaskEntity>()
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
@@ -52,9 +52,6 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     @StateTransitionFunc
     fun statusDeletedApply(event: StatusDeletedEvent) {
-        if (tasks.values.any { it.statusId == event.statusId })
-            throw IllegalStateException("Task or tasks with status ${event.statusId} exists")
-
         val status = statuses[event.statusId] ?: throw NullPointerException("Status ${event.statusId} does not exist")
 
         statuses.entries.forEach {
@@ -74,9 +71,6 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
         val status = statuses[event.statusId] ?: throw NullPointerException("Status ${event.statusId} does not exist")
 
         val oldPosition = status.position
-
-        if (event.position > statuses.size || event.position < 1)
-            throw IllegalArgumentException("Position ${event.position} out of bound")
 
         if (event.position < oldPosition) {
             statuses.entries.forEach {
@@ -103,12 +97,6 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     @StateTransitionFunc
     fun statusChangedForTaskEventApply(event: StatusChangedForTaskEvent) {
-        if (!statuses.containsKey(event.statusId))
-            throw NullPointerException("Status ${event.statusId} does not exist")
-
-        if (!tasks.containsKey(event.taskId))
-            throw NullPointerException("Task ${event.taskId} does not exist")
-
         tasks[event.taskId]?.statusId = event.statusId
         updatedAt = event.createdAt
     }
@@ -135,10 +123,6 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     @StateTransitionFunc
     fun taskAssigneeAddedEventApply(event: TaskAssigneeAddedEvent) {
-        val task = tasks[event.taskId] ?: throw NullPointerException("Task ${event.taskId} does not exist")
-        if (task.assignees.contains(event.memberId))
-            throw IllegalArgumentException("Member ${event.memberId} already assigned to task ${event.taskId}")
-
         tasks[event.taskId]!!.assignees.add(event.memberId)
         updatedAt = createdAt
     }

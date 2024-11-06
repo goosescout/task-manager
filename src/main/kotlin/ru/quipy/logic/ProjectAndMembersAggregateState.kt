@@ -15,7 +15,7 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
     private lateinit var id: UUID
     private lateinit var statusesAndTasksAggregateId: UUID
     private lateinit var project: ProjectEntity
-    private var members = mutableMapOf<UUID, MemberEntity>()
+    internal var members = mutableMapOf<UUID, MemberEntity>()
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
@@ -43,9 +43,6 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
 
     @StateTransitionFunc
     fun memberCreatedApply(event: MemberCreatedEvent) {
-        if (members.entries.firstOrNull { it.value.userId == event.userId } != null)
-            throw IllegalArgumentException("User ${event.userId} is already member of project ${event.projectId}")
-
         members[event.memberId] = MemberEntity(
             id = event.memberId,
             name = event.memberName,

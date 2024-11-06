@@ -47,7 +47,7 @@ class ProjectAndMembersController(
         @RequestParam creatorId: UUID,
     ) : ProjectCreatedEvent {
         val user = userEsService.getState(creatorId)
-            ?: throw NullPointerException("User $creatorId does not found")
+            ?: throw NullPointerException("User $creatorId was not found")
 
         val response = projectEsService.create { it.createProject(UUID.randomUUID(), UUID.randomUUID(), name) }
         taskEsService.create {
