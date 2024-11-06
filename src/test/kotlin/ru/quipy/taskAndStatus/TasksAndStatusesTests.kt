@@ -74,11 +74,11 @@ class TasksAndStatusesTests {
 		Assertions.assertEquals(newStatus.statusId, taskAgg.statusId)
 		Assertions.assertEquals(project.getId(), taskAgg.projectId)
 
-//		Assertions.assertThrows(
-//			IllegalStateException::class.java
-//		) {
-//			taskController.deleteTaskStatus(taskAggregate.getId(), newStatus.statusId)
-//		}
+		Assertions.assertThrows(
+			IllegalStateException::class.java
+		) {
+			taskController.deleteTaskStatus(taskAggregate.getId(), newStatus.statusId)
+		}
 
 		val taskNewStatus = taskController.changeStatusForTask(
 			taskAggregate.getId(),

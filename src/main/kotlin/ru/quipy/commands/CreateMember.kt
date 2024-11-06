@@ -6,11 +6,14 @@ import java.util.UUID
 
 fun ProjectAndMembersAggregateState.createMember(
     memberId: UUID,
-    login: String,
-    name: String,
-    userId: UUID,
+    login: String?,
+    name: String?,
+    userId: UUID?,
     projectId: UUID
 ): MemberCreatedEvent {
+    if (login == null || name == null || userId == null)
+        throw IllegalArgumentException("User $userId was not found")
+
     if (members.entries.firstOrNull { it.value.userId == userId } != null)
         throw IllegalArgumentException("User $userId is already member of project $projectId")
 

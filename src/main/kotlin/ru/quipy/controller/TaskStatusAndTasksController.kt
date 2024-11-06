@@ -26,7 +26,6 @@ import ru.quipy.core.EventSourcingService
 import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
 import ru.quipy.enums.StatusColor
-import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import java.util.UUID
 

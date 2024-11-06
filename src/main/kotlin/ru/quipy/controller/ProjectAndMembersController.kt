@@ -29,10 +29,9 @@ class ProjectAndMembersController(
     @PostMapping("/{projectId}/create-project-member")
     fun createMember(@PathVariable projectId: UUID, @RequestParam userId: UUID) : MemberCreatedEvent {
         val user = userEsService.getState(userId)
-            ?: throw NullPointerException("User $userId does not found")
 
         return projectEsService.update(projectId) {
-            it.createMember(UUID.randomUUID(), user.getLogin(), user.getName(), user.getId(), projectId)
+            it.createMember(UUID.randomUUID(), user?.getLogin(), user?.getName(), user?.getId(), projectId)
         }
     }
 
@@ -47,14 +46,13 @@ class ProjectAndMembersController(
         @RequestParam creatorId: UUID,
     ) : ProjectCreatedEvent {
         val user = userEsService.getState(creatorId)
-            ?: throw NullPointerException("User $creatorId was not found")
 
         val response = projectEsService.create { it.createProject(UUID.randomUUID(), UUID.randomUUID(), name) }
         taskEsService.create {
             it.createTaskStatus(UUID.randomUUID(), "CREATED", response.statusesAndTasksAggregateId, StatusColor.GREEN, response.projectId)
         }
         projectEsService.update(response.projectId) {
-            it.createMember(UUID.randomUUID(), user.getLogin(), user.getName(), user.getId(), response.projectId)
+            it.createMember(UUID.randomUUID(), user?.getLogin(), user?.getName(), user?.getId(), response.projectId)
         }
 
         return response
