@@ -47,9 +47,10 @@ class ProjectAndMembersController(
     ) : ProjectCreatedEvent {
         val user = userEsService.getState(creatorId)
 
-        val response = projectEsService.create { it.createProject(UUID.randomUUID(), UUID.randomUUID(), name) }
+        val response = projectEsService.create { it.createProject(UUID.randomUUID(), name) }
+
         taskEsService.create {
-            it.createTaskStatus(UUID.randomUUID(), "CREATED", response.statusesAndTasksAggregateId, StatusColor.GREEN, response.projectId)
+            it.createTaskStatus(UUID.randomUUID(), "CREATED", UUID.randomUUID(), StatusColor.GREEN, response.projectId)
         }
         projectEsService.update(response.projectId) {
             it.createMember(UUID.randomUUID(), user?.getLogin(), user?.getName(), user?.getId(), response.projectId)

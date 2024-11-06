@@ -33,6 +33,8 @@ class TasksAndStatusesTests {
 
 		val project = createProjectWithMember(owner.userId, user.userId)
 
+		Thread.sleep(500)
+
 		val taskAggregate = taskController.getTaskStatusesAndTasks(project!!.getStatusesAndTasksAggregateId())
 
 		Assertions.assertNotNull(taskAggregate)

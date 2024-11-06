@@ -11,7 +11,6 @@ const val MEMBER_CREATED_EVENT = "MEMBER_CREATED_EVENT"
 @DomainEvent(name = PROJECT_CREATED_EVENT)
 class ProjectCreatedEvent(
     val projectId: UUID,
-    val statusesAndTasksAggregateId: UUID,
     val projectName: String,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAndMembersAggregate>(
