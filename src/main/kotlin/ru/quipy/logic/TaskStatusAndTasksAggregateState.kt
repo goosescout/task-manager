@@ -47,7 +47,7 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
             projectId = projectId,
             position = statuses.size + 1
         )
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 
     @StateTransitionFunc
@@ -118,12 +118,12 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
             statusId = event.statusId,
             assignees = event.assignees,
         )
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 
     @StateTransitionFunc
     fun taskAssigneeAddedEventApply(event: TaskAssigneeAddedEvent) {
         tasks[event.taskId]!!.assignees.add(event.memberId)
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 }

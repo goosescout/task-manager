@@ -29,6 +29,6 @@ class UserAggregateState : AggregateState<UUID, UserAggregate> {
         name = event.userName
         login = event.login
         password = event.password
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 }

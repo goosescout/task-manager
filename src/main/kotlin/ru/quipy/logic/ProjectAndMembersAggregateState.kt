@@ -37,7 +37,7 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
             id = event.projectId,
             name = event.projectName,
         )
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 
     @StateTransitionFunc
@@ -49,14 +49,14 @@ class ProjectAndMembersAggregateState : AggregateState<UUID, ProjectAndMembersAg
             userId = event.userId,
             projectId = event.projectId,
         )
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 
     @StateTransitionFunc
     fun taskStatusCreatedApply(event: TaskStatusCreatedForProjectEvent) {
         if (event.projectId == project.id) {
             statusesAndTasksAggregateId = event.aggregateId
-            updatedAt = createdAt
+            updatedAt = event.createdAt
         }
     }
 }
