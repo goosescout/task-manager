@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+      - ${POSTGRES_DB_PORT}:${POSTGRES_INNER_PORT}
     restart: unless-stopped
   mongo:
     build:

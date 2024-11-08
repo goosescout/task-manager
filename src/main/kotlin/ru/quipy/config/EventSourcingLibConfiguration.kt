@@ -4,17 +4,28 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.quipy.api.ProjectAggregate
+import ru.quipy.api.MemberCreatedEvent
+import ru.quipy.api.ProjectAndMembersAggregate
+import ru.quipy.api.ProjectCreatedEvent
+import ru.quipy.api.TaskCreatedEvent
+import ru.quipy.api.TaskStatusAndTasksAggregate
+import ru.quipy.api.TaskStatusCreatedEvent
+import ru.quipy.api.TaskUpdatedEvent
+import ru.quipy.api.UserAggregate
+import ru.quipy.api.UserCreatedEvent
+import ru.quipy.core.AggregateRegistry
 import ru.quipy.core.EventSourcingServiceFactory
-import ru.quipy.logic.ProjectAggregateState
-import ru.quipy.projections.AnnotationBasedProjectEventsSubscriber
+import ru.quipy.logic.ProjectAndMembersAggregateState
+import ru.quipy.logic.TaskStatusAndTasksAggregateState
+import ru.quipy.logic.UserAggregateState
+import ru.quipy.projections.AnnotationBasedUserEventsSubscriber
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
-import java.util.*
+import java.util.UUID
 import javax.annotation.PostConstruct
 
 /**
- * This files contains some configurations that you might want to have in your project. Some configurations are
+ * This file contains some configurations that you might want to have in your project. Some configurations are
  * made in for the sake of demonstration and not required for the library functioning. Usually you can have even
  * more minimalistic config
  *
@@ -38,11 +49,9 @@ class EventSourcingLibConfiguration {
 
     private val logger = LoggerFactory.getLogger(EventSourcingLibConfiguration::class.java)
 
-    @Autowired
-    private lateinit var subscriptionsManager: AggregateSubscriptionsManager
 
     @Autowired
-    private lateinit var projectEventSubscriber: AnnotationBasedProjectEventsSubscriber
+    private lateinit var projectEventSubscriber: AnnotationBasedUserEventsSubscriber
 
     @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory
@@ -50,18 +59,28 @@ class EventSourcingLibConfiguration {
     @Autowired
     private lateinit var eventStreamManager: AggregateEventStreamManager
 
+    @Autowired
+    private lateinit var aggregateRegistry: AggregateRegistry
+
+    @Autowired
+    private lateinit var subscriptionsManager : AggregateSubscriptionsManager
+
     /**
      * Use this object to create/update the aggregate
      */
     @Bean
-    fun projectEsService() = eventSourcingServiceFactory.create<UUID, ProjectAggregate, ProjectAggregateState>()
+    fun userEsService() = eventSourcingServiceFactory.create<UUID, UserAggregate, UserAggregateState>()
+
+    @Bean
+    fun projectEsService() =
+        eventSourcingServiceFactory.create<UUID, ProjectAndMembersAggregate, ProjectAndMembersAggregateState>()
+
+    @Bean
+    fun taskEsService() =
+        eventSourcingServiceFactory.create<UUID, TaskStatusAndTasksAggregate, TaskStatusAndTasksAggregateState>()
 
     @PostConstruct
     fun init() {
-        // Demonstrates how to explicitly subscribe the instance of annotation based subscriber to some stream. See the [AggregateSubscriptionsManager]
-        subscriptionsManager.subscribe<ProjectAggregate>(projectEventSubscriber)
-
-        // Demonstrates how you can set up the listeners to the event stream
         eventStreamManager.maintenance {
             onRecordHandledSuccessfully { streamName, eventName ->
                 logger.info("Stream $streamName successfully processed record of $eventName")
@@ -72,5 +91,4 @@ class EventSourcingLibConfiguration {
             }
         }
     }
-
 }
