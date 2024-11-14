@@ -83,4 +83,9 @@ class ProjectAndMembersController(
     fun getAllProjects(): MutableList<ProjectDto> {
         return gateway.getAllProjects()
     }
+
+    @GetMapping("/{projectId}/get-all-statuses")
+    fun getProjectWithAllStatuses(@PathVariable projectId: UUID): ProjectDto {
+        return gateway.getProjectWithAllStatuses(projectId)
+    }
 }

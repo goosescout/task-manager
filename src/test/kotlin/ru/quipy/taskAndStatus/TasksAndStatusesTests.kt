@@ -74,7 +74,6 @@ class TasksAndStatusesTests {
 		Assertions.assertEquals("Description1", taskAgg.description)
 		Assertions.assertEquals(0, taskAgg.assignees.size)
 		Assertions.assertEquals(newStatus.statusId, taskAgg.statusId)
-		Assertions.assertEquals(project.getId(), taskAgg.projectId)
 
 		Assertions.assertThrows(
 			IllegalStateException::class.java

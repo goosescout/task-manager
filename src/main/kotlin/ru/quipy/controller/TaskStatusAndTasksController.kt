@@ -140,22 +140,17 @@ class TaskStatusAndTasksController(
         }
     }
 
-    @GetMapping("/{id}/find-members")
+    @GetMapping("/{taskId}/find-members")
     fun findMembers(@PathVariable taskId: UUID, @RequestParam substring: String): MutableList<MemberEntity> {
         return gateway.getAllMembersByNameSubstringNotAssignToTask(taskId, substring)
     }
 
-    @GetMapping("/{id}/get-all-statuses")
-    fun getProjectWithAllStatuses(@PathVariable projectId: UUID): ProjectDto {
-        return gateway.getProjectWithAllStatuses(projectId)
-    }
-
-    @GetMapping("/task/{id}")
+    @GetMapping("/task/{taskId}")
     fun getTask(@PathVariable taskId: UUID): TaskWithMembersDto {
         return gateway.getTask(taskId)
     }
 
-    @GetMapping("/status/{id}")
+    @GetMapping("/status/{statusId}")
     fun getStatus(@PathVariable statusId: UUID): StatusDto {
         return gateway.getStatus(statusId)
     }
