@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
@@ -31,9 +30,8 @@ import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import ru.quipy.projections.Gateway
 import ru.quipy.projections.dto.ProjectDto
 import ru.quipy.projections.dto.StatusDto
-import ru.quipy.projections.dto.TaskDto
 import ru.quipy.projections.dto.TaskWithMembersDto
-import ru.quipy.projections.entities.UserEntity
+import ru.quipy.projections.entities.TaskDBEntity
 import java.util.UUID
 
 @RestController

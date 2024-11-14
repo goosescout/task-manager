@@ -12,6 +12,7 @@ import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
+import ru.quipy.projections.entities.TaskDBEntity
 import java.util.UUID
 
 class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksAggregate> {

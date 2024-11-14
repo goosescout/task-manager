@@ -67,7 +67,7 @@ class ProjectAndMembersProjection(
     }
 
     fun getAllMembersByNameSubstring(projectId: UUID, substring: String): List<MemberEntity> {
-        return memberRepository.findByUsernameOrLoginContaining(substring, substring).filter {
+        return memberRepository.findByNameOrLoginContaining(substring, substring).filter {
             it.projectId == projectId
         }
     }

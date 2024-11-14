@@ -22,8 +22,9 @@ class Gateway (
     fun getAllMembersByNameSubstringNotAssignToTask(id: UUID, substring: String): MutableList<MemberEntity> {
         val task = statusesAndTasksProjection.getTaskById(id)
         val status = statusesAndTasksProjection.getStatusById(task.statusId)
+        val assignees = statusesAndTasksProjection.getAllTaskAssigneesByTaskId(id)
         return projectAndMembersProjection.getAllMembersByNameSubstring(status.projectId, substring).filter {
-            !task.assignees.contains(it.id)
+            !assignees.contains(it.id)
         }.toMutableList()
     }
 
@@ -33,21 +34,26 @@ class Gateway (
                 it.toDto()
             }.toMutableList(),
             statusesAndTasksProjection.getAllStatusesByProjectId(projectId).map {
-                it.toDto(statusesAndTasksProjection.getAllTasksByStatusId(it.id).map { it.toDto() }.toMutableList())
+                st -> st.toDto(statusesAndTasksProjection.getAllTasksByStatusId(st.id).map {
+                    t -> t.toDto(statusesAndTasksProjection.getAllTaskAssigneesByTaskId(t.id).toMutableList())
+                }.toMutableList())
             }.toMutableList()
         )
     }
 
     fun getTask(taskId: UUID): TaskWithMembersDto {
         val task = statusesAndTasksProjection.getTaskById(taskId)
+        val assignees = statusesAndTasksProjection.getAllTaskAssigneesByTaskId(taskId)
         return statusesAndTasksProjection.getTaskById(taskId).toDto(
-            projectAndMembersProjection.getAllMembersById(task.assignees).map { it.toDto() }.toMutableList()
+            projectAndMembersProjection.getAllMembersById(assignees).map { it.toDto() }.toMutableList()
         )
     }
 
     fun getStatus(statusId: UUID): StatusDto {
         return statusesAndTasksProjection.getStatusById(statusId).toDto(
-            statusesAndTasksProjection.getAllTasksByStatusId(statusId).map { it.toDto() }.toMutableList()
+            statusesAndTasksProjection.getAllTasksByStatusId(statusId).map {
+                it.toDto(statusesAndTasksProjection.getAllTaskAssigneesByTaskId(it.id).toMutableList())
+            }.toMutableList()
         )
     }
 }

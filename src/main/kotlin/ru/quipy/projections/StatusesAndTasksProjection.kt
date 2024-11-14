@@ -4,8 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import ru.quipy.api.MemberCreatedEvent
-import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
@@ -15,21 +13,14 @@ import ru.quipy.api.TaskStatusAndTasksAggregate
 import ru.quipy.api.TaskStatusCreatedEvent
 import ru.quipy.api.TaskUpdatedEvent
 import ru.quipy.api.UserAggregate
-import ru.quipy.api.UserCreatedEvent
 import ru.quipy.core.EventSourcingService
-import ru.quipy.entities.ProjectEntity
-import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
-import ru.quipy.logic.UserAggregateState
-import ru.quipy.projections.entities.MemberUserIdToProjectIdEntity
-import ru.quipy.projections.entities.UserEntity
-import ru.quipy.projections.repository.MemberRepository
-import ru.quipy.projections.repository.MemberUserIdToProjectIdRepository
-import ru.quipy.projections.repository.ProjectRepository
+import ru.quipy.projections.entities.TaskAssigneeEntity
+import ru.quipy.projections.entities.TaskDBEntity
 import ru.quipy.projections.repository.StatusRepository
+import ru.quipy.projections.repository.TaskAssigneeRepository
 import ru.quipy.projections.repository.TaskRepository
-import ru.quipy.projections.repository.UserRepository
 import ru.quipy.streams.AggregateSubscriptionsManager
 import ru.quipy.streams.annotation.AggregateSubscriber
 import ru.quipy.streams.annotation.SubscribeEvent
@@ -43,6 +34,7 @@ import javax.annotation.PostConstruct
 class StatusesAndTasksProjection(
     private val statusRepository: StatusRepository,
     private val taskRepository: TaskRepository,
+    private val taskAssigneeRepository: TaskAssigneeRepository,
     private val subscriptionsManager: AggregateSubscriptionsManager,
     val taskEsService: EventSourcingService<UUID, TaskStatusAndTasksAggregate, TaskStatusAndTasksAggregateState>,
 ) {
@@ -53,7 +45,7 @@ class StatusesAndTasksProjection(
         subscriptionsManager.createSubscriber(TaskStatusAndTasksAggregate::class, "status:status-projection") {
             `when`(TaskCreatedEvent::class) { event ->
                 withContext(Dispatchers.IO) {
-                    taskRepository.save(TaskEntity(event.taskId, event.taskName, event.description, event.assignees, event.statusId))
+                    taskRepository.save(TaskDBEntity(event.taskId, event.taskName, event.description, event.statusId))
                 }
                 logger.info("Update status projection, create task ${event.taskId}")
             }
@@ -76,9 +68,7 @@ class StatusesAndTasksProjection(
             }
             `when`(TaskAssigneeAddedEvent::class) { event ->
                 withContext(Dispatchers.IO) {
-                    val task = taskRepository.getReferenceById(event.taskId)
-                    task.assignees.add(event.memberId)
-                    taskRepository.save(task)
+                    taskAssigneeRepository.save(TaskAssigneeEntity(UUID.randomUUID(), event.taskId, event.memberId))
                 }
                 logger.info("Update status projection, add assignee to task ${event.taskId}")
             }
@@ -109,19 +99,23 @@ class StatusesAndTasksProjection(
         return statusRepository.findAllById(ids)
     }
 
-    fun getAllTasksById(ids: List<UUID>): List<TaskEntity> {
+    fun getAllTasksById(ids: List<UUID>): List<TaskDBEntity> {
         return taskRepository.findAllById(ids)
+    }
+
+    fun getAllTaskAssigneesByTaskId(id: UUID): List<UUID> {
+        return taskAssigneeRepository.findAllByTaskId(id).map { it.assigneeId }
     }
 
     fun getAllStatusesByProjectId(id: UUID): List<TaskStatusEntity> {
         return statusRepository.findAllByProjectId(id)
     }
 
-    fun getAllTasksByStatusId(id: UUID): List<TaskEntity> {
+    fun getAllTasksByStatusId(id: UUID): List<TaskDBEntity> {
         return taskRepository.findAllByStatusId(id)
     }
 
-    fun getTaskById(id: UUID): TaskEntity {
+    fun getTaskById(id: UUID): TaskDBEntity {
         return taskRepository.findById(id).get()
     }
 

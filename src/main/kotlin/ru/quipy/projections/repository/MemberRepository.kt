@@ -7,5 +7,5 @@ import java.util.UUID
 interface MemberRepository: JpaRepository<MemberEntity, UUID> {
     fun findByProjectId(id: UUID): MutableList<MemberEntity>
 
-    fun findByUsernameOrLoginContaining(nameSubstring: String, loginSubstring: String): MutableList<MemberEntity>
+    fun findByNameOrLoginContaining(nameSubstring: String, loginSubstring: String): MutableList<MemberEntity>
 }

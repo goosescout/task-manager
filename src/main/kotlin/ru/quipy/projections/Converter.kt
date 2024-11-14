@@ -2,14 +2,13 @@ package ru.quipy.projections
 
 import ru.quipy.entities.MemberEntity
 import ru.quipy.entities.ProjectEntity
-import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
-import ru.quipy.enums.StatusColor
 import ru.quipy.projections.dto.MemberDto
 import ru.quipy.projections.dto.ProjectDto
 import ru.quipy.projections.dto.StatusDto
 import ru.quipy.projections.dto.TaskDto
 import ru.quipy.projections.dto.TaskWithMembersDto
+import ru.quipy.projections.entities.TaskDBEntity
 import java.util.UUID
 
 fun ProjectEntity.toDto(members: MutableList<MemberDto>, statuses: MutableList<StatusDto>): ProjectDto {
@@ -40,16 +39,16 @@ fun TaskStatusEntity.toDto(tasks: MutableList<TaskDto>): StatusDto {
     )
 }
 
-fun TaskEntity.toDto(): TaskDto {
+fun TaskDBEntity.toDto(assignees: MutableList<UUID>): TaskDto {
     return TaskDto(
         id = this.id,
         name = this.name,
         description = this.description,
-        assignees = this.assignees,
+        assignees = assignees,
     )
 }
 
-fun TaskEntity.toDto(members: MutableList<MemberDto>): TaskWithMembersDto {
+fun TaskDBEntity.toDto(members: MutableList<MemberDto>): TaskWithMembersDto {
     return TaskWithMembersDto(
         id = this.id,
         name = this.name,
