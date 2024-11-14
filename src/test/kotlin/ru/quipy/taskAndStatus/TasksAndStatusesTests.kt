@@ -169,6 +169,10 @@ class TasksAndStatusesTests {
 		validateStatus(taskAggregate.getId(), zeroId, zeroStatus, 1)
 		validateStatus(taskAggregate.getId(), firstId, firstStatus, 3)
 		validateStatus(taskAggregate.getId(), secondId, secondStatus, 2)
+
+		taskController.deleteTaskStatus(taskAggregate.getId(), firstId)
+		validateStatus(taskAggregate.getId(), zeroId, zeroStatus, 1)
+		validateStatus(taskAggregate.getId(), secondId, secondStatus, 2)
 	}
 
 	private fun validateStatus(aggId: UUID, actualId: UUID, expectedStatus: TaskStatusEntity, expectedPosition: Int) {

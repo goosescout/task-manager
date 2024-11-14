@@ -26,6 +26,8 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
 
     override fun getId() = id
 
+    fun getProjectId() = projectId
+
     fun getTasks() = tasks.values.toList()
 
     fun getStatuses() = statuses.values.toList()
@@ -114,7 +116,6 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
             id = event.taskId,
             name = event.taskName,
             description = event.description,
-            projectId = projectId,
             statusId = event.statusId,
             assignees = event.assignees,
         )

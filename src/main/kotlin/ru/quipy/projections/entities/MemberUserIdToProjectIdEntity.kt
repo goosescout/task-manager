@@ -1,15 +1,13 @@
-package ru.quipy.entities
+package ru.quipy.projections.entities
 
 import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class MemberEntity(
+data class MemberUserIdToProjectIdEntity(
     @Id
-    val id: UUID = UUID.randomUUID(),
-    val name: String = "",
-    val login: String = "",
+    val memberId: UUID = UUID.randomUUID(),
     val userId: UUID = UUID.randomUUID(),
     val projectId: UUID = UUID.randomUUID(),
 )
