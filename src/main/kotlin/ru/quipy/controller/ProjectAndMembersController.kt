@@ -17,6 +17,10 @@ import ru.quipy.enums.StatusColor
 import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import ru.quipy.logic.UserAggregateState
+import ru.quipy.projections.Gateway
+import ru.quipy.projections.UserNotInProjectProjection
+import ru.quipy.projections.dto.ProjectDto
+import ru.quipy.projections.entities.UserEntity
 import java.util.UUID
 
 @RestController
@@ -24,7 +28,9 @@ import java.util.UUID
 class ProjectAndMembersController(
     val projectEsService: EventSourcingService<UUID, ProjectAndMembersAggregate, ProjectAndMembersAggregateState>,
     val taskEsService: EventSourcingService<UUID, TaskStatusAndTasksAggregate, TaskStatusAndTasksAggregateState>,
-    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>
+    val userEsService: EventSourcingService<UUID, UserAggregate, UserAggregateState>,
+    val userProjection: UserNotInProjectProjection,
+    val gateway: Gateway,
 ) {
 
     @PostMapping("/{projectId}/create-project-member")
@@ -66,5 +72,20 @@ class ProjectAndMembersController(
     @GetMapping("/{id}")
     fun getProject(@PathVariable id: UUID) : ProjectAndMembersAggregateState? {
         return projectEsService.getState(id)
+    }
+
+    @GetMapping("/{id}/find-users")
+    fun findUsers(@PathVariable id: UUID, @RequestParam substring: String): MutableList<UserEntity> {
+        return userProjection.getAllUsersByNameSubstringNotInProject(id, substring)
+    }
+
+    @GetMapping("/get-all-projects")
+    fun getAllProjects(): MutableList<ProjectDto> {
+        return gateway.getAllProjects()
+    }
+
+    @GetMapping("/{projectId}/get-all-statuses")
+    fun getProjectWithAllStatuses(@PathVariable projectId: UUID): ProjectDto {
+        return gateway.getProjectWithAllStatuses(projectId)
     }
 }

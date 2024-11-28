@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   postgres:
-    hostname: event_sourcing_db
+    hostname: pg_db
     image: postgres:14.9-alpine
     env_file:
       - ./.env
@@ -12,14 +12,3 @@ services:
     ports:
       - ${POSTGRES_DB_PORT}:${POSTGRES_INNER_PORT}
     restart: unless-stopped
-  mongo:
-    build:
-      context: mongoDb
-#      dockerfile: mongoDb/Dockerfile
-    restart: always
-    ports:
-      - 27017:27017
-    volumes:
-      - mongo_data:/data/db
-volumes:
-  mongo_data: { }

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.quipy.api.ProjectAndMembersAggregate
 import ru.quipy.api.StatusChangedForTaskEvent
 import ru.quipy.api.StatusDeletedEvent
 import ru.quipy.api.StatusPositionChangedEvent
@@ -23,15 +22,22 @@ import ru.quipy.commands.createTaskStatus
 import ru.quipy.commands.deleteTaskStatus
 import ru.quipy.commands.updateTask
 import ru.quipy.core.EventSourcingService
+import ru.quipy.entities.MemberEntity
 import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
 import ru.quipy.enums.StatusColor
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
+import ru.quipy.projections.Gateway
+import ru.quipy.projections.dto.ProjectDto
+import ru.quipy.projections.dto.StatusDto
+import ru.quipy.projections.dto.TaskWithMembersDto
+import ru.quipy.projections.entities.TaskDBEntity
 import java.util.UUID
 
 @RestController
 class TaskStatusAndTasksController(
     val taskEsService: EventSourcingService<UUID, TaskStatusAndTasksAggregate, TaskStatusAndTasksAggregateState>,
+    val gateway: Gateway,
 ) {
 
     @PostMapping("/tasks/{taskAggregateId}/task/create")
@@ -113,7 +119,7 @@ class TaskStatusAndTasksController(
                 name,
                 taskAggregateId,
                 StatusColor.valueOf(color),
-                null
+                getTaskStatusesAndTasks(taskAggregateId)!!.getProjectId()
             )
         }
     }
@@ -132,5 +138,20 @@ class TaskStatusAndTasksController(
         return taskEsService.update(taskAggregateId) {
             it.addTaskAssignee(taskId, memberId)
         }
+    }
+
+    @GetMapping("/{taskId}/find-members")
+    fun findMembers(@PathVariable taskId: UUID, @RequestParam substring: String): MutableList<MemberEntity> {
+        return gateway.getAllMembersByNameSubstringNotAssignToTask(taskId, substring)
+    }
+
+    @GetMapping("/task/{taskId}")
+    fun getTask(@PathVariable taskId: UUID): TaskWithMembersDto {
+        return gateway.getTask(taskId)
+    }
+
+    @GetMapping("/status/{statusId}")
+    fun getStatus(@PathVariable statusId: UUID): StatusDto {
+        return gateway.getStatus(statusId)
     }
 }

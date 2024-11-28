@@ -1,11 +1,14 @@
-package ru.quipy.entities
+package ru.quipy.projections.entities
 
 import java.util.UUID
+import javax.persistence.Entity
+import javax.persistence.Id
 
-data class TaskEntity(
+@Entity
+data class TaskDBEntity(
+    @Id
     val id: UUID = UUID.randomUUID(),
     var name: String = "",
     var description: String = "",
-    val assignees: MutableList<UUID> = mutableListOf(),
     var statusId: UUID = UUID.randomUUID(),
 )

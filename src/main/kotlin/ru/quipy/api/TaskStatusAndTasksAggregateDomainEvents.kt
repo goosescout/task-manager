@@ -63,7 +63,7 @@ class TaskStatusCreatedEvent(
     val statusName: String,
     val aggregateId: UUID,
     val color: StatusColor,
-    val projectId: UUID?,
+    val projectId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<TaskStatusAndTasksAggregate>(
     name = TASK_STATUS_CREATED_EVENT,

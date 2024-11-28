@@ -1,16 +1,12 @@
-package ru.quipy.entities
+package ru.quipy.projections.dto
 
 import ru.quipy.enums.StatusColor
 import java.util.UUID
-import javax.persistence.Entity
-import javax.persistence.Id
 
-@Entity
-data class TaskStatusEntity(
-    @Id
+data class StatusDto (
     val id: UUID = UUID.randomUUID(),
     val name: String = "",
-    val projectId: UUID = UUID.randomUUID(),
     val color: StatusColor = StatusColor.LIGHT_BLUE,
     var position: Int = 0,
+    val tasks: MutableList<TaskDto> = mutableListOf(),
 )

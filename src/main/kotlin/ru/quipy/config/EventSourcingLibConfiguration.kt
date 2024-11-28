@@ -18,7 +18,6 @@ import ru.quipy.core.EventSourcingServiceFactory
 import ru.quipy.logic.ProjectAndMembersAggregateState
 import ru.quipy.logic.TaskStatusAndTasksAggregateState
 import ru.quipy.logic.UserAggregateState
-import ru.quipy.projections.AnnotationBasedUserEventsSubscriber
 import ru.quipy.streams.AggregateEventStreamManager
 import ru.quipy.streams.AggregateSubscriptionsManager
 import java.util.UUID
@@ -48,10 +47,6 @@ import javax.annotation.PostConstruct
 class EventSourcingLibConfiguration {
 
     private val logger = LoggerFactory.getLogger(EventSourcingLibConfiguration::class.java)
-
-
-    @Autowired
-    private lateinit var projectEventSubscriber: AnnotationBasedUserEventsSubscriber
 
     @Autowired
     private lateinit var eventSourcingServiceFactory: EventSourcingServiceFactory

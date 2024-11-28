@@ -12,6 +12,7 @@ import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import ru.quipy.entities.TaskEntity
 import ru.quipy.entities.TaskStatusEntity
+import ru.quipy.projections.entities.TaskDBEntity
 import java.util.UUID
 
 class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksAggregate> {
@@ -25,6 +26,8 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
     var updatedAt: Long = System.currentTimeMillis()
 
     override fun getId() = id
+
+    fun getProjectId() = projectId
 
     fun getTasks() = tasks.values.toList()
 
@@ -114,7 +117,6 @@ class TaskStatusAndTasksAggregateState: AggregateState<UUID, TaskStatusAndTasksA
             id = event.taskId,
             name = event.taskName,
             description = event.description,
-            projectId = projectId,
             statusId = event.statusId,
             assignees = event.assignees,
         )
